@@ -8,9 +8,8 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
-    constructor(address _daiTokenAddress, string memory uri) ERC1155(uri) {
+    constructor(address _daiTokenAddress, string memory uri) ERC1155(uri) Ownable(msg.sender) {
         daiTokenAddress = _daiTokenAddress;
-        admin = msg.sender;
     }
 
     IERC20 daiToken = IERC20(daiTokenAddress);
@@ -32,20 +31,19 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         override 
         returns (string memory) 
    {
-        require(_exists(_eventID), "ERC1155Metadata: URI query for nonexistent token");
+        //require(exists(_eventID), "ERC1155Metadata: URI query for nonexistent token");
 
         // If a specific URI is set for the token ID, return that URI
         if (bytes(_tokenURIs[_eventID]).length > 0) {
             return _tokenURIs[_eventID];
         } else {
             // If no specific URI is set, fall back to the default URI
-            return super.uri(tokenId);
+            return super.uri(_eventID);
         }
     }
 
     function mint(address account, uint256 id, uint256 amount, bytes memory data)
-        public
-        onlyOwner
+        internal    
     {
         _mint(account, id, amount, data);
     }
@@ -59,22 +57,21 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
 
     // The following functions are overrides required by Solidity.
 
-    function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    function _update(address from, address to, uint256[] memory ids, uint256[] memory values)
         internal
         override(ERC1155, ERC1155Supply)
     {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+        super._update(from, to, ids, values);
     }
 
 //Variables
     address public minterContract;
-    address public admin;
     uint256 public adminBalance;
     uint256 conversion = 1;
     address public daiTokenAddress;  // Address of the DAI token contract
     uint256 eventCounter = 1; //Token 0 is FCoin
     mapping(uint256 => string) private _tokenURIs; //URIs of each event
-
+    mapping(address => uint256) private creatorCut;
     struct Event {
         string Name;
         address Creator;
@@ -147,14 +144,24 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
     function endEvent(uint256 _eventID) external {
         require(block.timestamp >= events[_eventID].StartTime + (events[_eventID].Duration * 60), "The event is still ongoing");
         require(events[_eventID].HasEnded == false, "Event has ended");
-        events[_eventID].HasEnded == true;
-        uint256 DAI = (events[_eventID].FCoins  * 97) / conversion / 100;
+        events[_eventID].HasEnded = true;
+        uint256 DAI = (events[_eventID].FCoins * 97) / conversion / 100;
         adminBalance = (events[_eventID].FCoins / conversion) - DAI;
-        burn(address(this), 0, events[_eventID].FCoins);
-        bool success = daiToken.transferFrom(address(this), events[_eventID].Creator, DAI);
-        require(success, "Failed to send DAI payment");
+    
+    // Assign the DAI amount to the creator's cut
+        creatorCut[events[_eventID].Creator] = creatorCut[events[_eventID].Creator] + DAI;
+    
+        _burn(address(this), 0, events[_eventID].FCoins);
         mint(events[_eventID].Creator, _eventID, 1, "");
-        emit EventEnded(_eventID ,events[_eventID].Creator, events[_eventID].FCoins);
+        emit EventEnded(_eventID, events[_eventID].Creator, events[_eventID].FCoins);
+    }
+
+    function claimDAI() external {
+        uint256 DAI = creatorCut[msg.sender];
+        creatorCut[msg.sender] = 0;  // Reset the creator's cut after claiming
+    
+        bool success = daiToken.transfer(msg.sender, DAI);
+        require(success, "Failed to send DAI payment");
     }
 
     function mintNFT(uint256 _eventID) external onlySupporter(_eventID) {
@@ -164,10 +171,9 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         hasMinted[_eventID][msg.sender] = true;
     }
 
-    function take profits() external onlyOwner {
+    function takeprofits() external onlyOwner {
         uint256 DAI = adminBalance;
         bool success = daiToken.transferFrom(address(this), msg.sender, DAI);
         require(success, "Failed to send DAI payment");
     }
-
 }
