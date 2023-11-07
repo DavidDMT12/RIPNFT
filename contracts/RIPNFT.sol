@@ -8,16 +8,40 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
-    constructor(address _daiTokenAddress) ERC1155("") {
+    constructor(address _daiTokenAddress, string memory uri) ERC1155(uri) {
         daiTokenAddress = _daiTokenAddress;
         admin = msg.sender;
     }
 
     IERC20 daiToken = IERC20(daiTokenAddress);
+    
 
 //OpenZeppelin implementation functions
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
+    }
+
+    function setTokenURI(uint256 _eventID, string memory tokenURI) internal {
+        require(msg.sender == events[_eventID].Creator , "Event has ended");
+        _tokenURIs[_eventID] = tokenURI;
+    }
+
+   // Override the _uri function to return the correct URI based on the event ID
+    function uri(uint256 _eventID) 
+        public 
+        view 
+        override 
+        returns (string memory) 
+   {
+        require(_exists(_eventID), "ERC1155Metadata: URI query for nonexistent token");
+
+        // If a specific URI is set for the token ID, return that URI
+        if (bytes(_tokenURIs[_eventID]).length > 0) {
+            return _tokenURIs[_eventID];
+        } else {
+            // If no specific URI is set, fall back to the default URI
+            return super.uri(tokenId);
+        }
     }
 
     function mint(address account, uint256 id, uint256 amount, bytes memory data)
@@ -50,6 +74,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
     uint256 conversion = 1;
     address public daiTokenAddress;  // Address of the DAI token contract
     uint256 eventCounter = 1; //Token 0 is FCoin
+    mapping(uint256 => string) private _tokenURIs; //URIs of each event
 
     struct Event {
         string Name;
