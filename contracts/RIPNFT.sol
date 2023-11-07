@@ -22,7 +22,6 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
     }
 
     function setTokenURI(uint256 _eventID, string memory tokenURI) internal {
-        require(msg.sender == events[_eventID].Creator , "Event has ended");
         _tokenURIs[_eventID] = tokenURI;
     }
 
@@ -131,6 +130,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         events[_thisEvent].Creator = msg.sender;
         events[_thisEvent].StartTime = block.timestamp;
         events[_thisEvent].MinimumTip = _MinimumTip;
+        setTokenURI(_thisEvent, _NFTURI);
         eventCounter = eventCounter + 1;
         emit EventStarted(_thisEvent, msg.sender, _minutes);
     }
