@@ -126,7 +126,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         uint256 DAI = (events[_eventID].FCoins  * 97) / conversion / 100;
         adminBalance = (events[_eventID].FCoins / conversion) - DAI;
         burn(address(this), 0, events[_eventID].FCoins);
-        bool success = daiToken.transferFrom(address(this), msg.sender, DAI);
+        bool success = daiToken.transferFrom(address(this), events[_eventID].Creator, DAI);
         require(success, "Failed to send DAI payment");
         mint(events[_eventID].Creator, _eventID, 1, "");
         emit EventEnded(_eventID ,events[_eventID].Creator, events[_eventID].FCoins);
