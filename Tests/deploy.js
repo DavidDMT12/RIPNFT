@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
 
 const alchemyApiKey = "ALCHEMY_API_KEY";
-const daiTokenAddress = "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3";
+const daiTokenAddress = "DAI_ADDRESS";
 const uri = "https://github.com/DavidDMT12/FCoin/tree/48eaef51396aa8ece707911af0a48c8657e55735/JSON/";
 
 async function deployContract() {
