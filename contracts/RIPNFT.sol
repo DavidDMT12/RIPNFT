@@ -6,8 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
-contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
+contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Receiver {
     constructor(address _daiTokenAddress, string memory uri) ERC1155(uri) Ownable(msg.sender) {
         daiTokenAddress = _daiTokenAddress;
     }
@@ -64,14 +65,39 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         super._update(from, to, ids, values);
     }
 
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) public override returns (bytes4) {
+        require(id == 0, "This contract does not support NFT receivals");
+        
+        // Return ERC1155 receiver function signature
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) public override returns (bytes4) {
+       require(ids.length == 1 && values.length == 1 && ids[0] == 0, "This contract only supports NFT receivals");
+        
+        // Return ERC1155 receiver function signature
+        return this.onERC1155BatchReceived.selector;
+    }
+
 //Variables
-    address public minterContract;
     uint256 public adminBalance;
     uint256 conversion = 1;
     address public daiTokenAddress;  // Address of the DAI token contract
     uint256 eventCounter = 1; //Token 0 is FCoin
-    mapping(uint256 => string) private _tokenURIs; //URIs of each event
-    mapping(address => uint256) private creatorCut;
+    mapping(uint256 => string) public _tokenURIs; //URIs of each event
+    mapping(address => uint256) public creatorCut;
     struct Event {
         string Name;
         address Creator;
@@ -111,7 +137,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
     function getFcoins(uint256 _amount) external {
         uint256 DAI = _amount * conversion;
         // Transfer DAI tokens from the payer to this contract
-        bool success = daiToken.transferFrom(msg.sender, address(this), DAI);
+        bool success = IERC20(daiTokenAddress).transferFrom(msg.sender,address(this), DAI);
         require(success, "Failed to receive DAI payment");
         mint(msg.sender, 0, _amount, "");
         emit BuyFCoin(msg.sender, _amount);
@@ -146,7 +172,8 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         require(events[_eventID].HasEnded == false, "Event has ended");
         events[_eventID].HasEnded = true;
         uint256 DAI = (events[_eventID].FCoins * 97) / conversion / 100;
-        adminBalance = (events[_eventID].FCoins / conversion) - DAI;
+        uint256 total = (events[_eventID].FCoins / conversion);
+        adminBalance =  total - DAI;
     
     // Assign the DAI amount to the creator's cut
         creatorCut[events[_eventID].Creator] = creatorCut[events[_eventID].Creator] + DAI;
@@ -160,7 +187,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
         uint256 DAI = creatorCut[msg.sender];
         creatorCut[msg.sender] = 0;  // Reset the creator's cut after claiming
     
-        bool success = daiToken.transfer(msg.sender, DAI);
+        bool success = IERC20(daiTokenAddress).transfer(msg.sender, DAI);
         require(success, "Failed to send DAI payment");
     }
 
@@ -173,7 +200,8 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply {
 
     function takeprofits() external onlyOwner {
         uint256 DAI = adminBalance;
-        bool success = daiToken.transferFrom(address(this), msg.sender, DAI);
+        adminBalance = 0;
+        bool success = IERC20(daiTokenAddress).transfer(msg.sender, DAI);
         require(success, "Failed to send DAI payment");
     }
 }
