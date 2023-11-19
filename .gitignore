@@ -1,0 +1,5 @@
+.env
+.deps
+artifacts
+build
+node_modules

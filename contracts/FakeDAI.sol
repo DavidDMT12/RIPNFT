@@ -1,32 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-//For testing RIPNFT
-contract FAKEDAI {
-    string public name = "FakeDAI";
-    string public symbol = "FDAI";
-    uint8 public decimals = 18;
-    uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
+pragma solidity ^0.8.20;
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
-    constructor(uint256 initialSupply) {
-        totalSupply = initialSupply * (10**uint256(decimals));
-        balanceOf[msg.sender] = totalSupply;
+contract FakeDAI is ERC20, ERC20Burnable {
+    constructor()
+        ERC20("FAKEDAI", "FDAI")
+    {
+        _mint(msg.sender, 1000 * 10 ** decimals());
     }
 
-    function transfer(address to, uint256 value) external returns (bool) {
-        require(to != address(0), "Invalid address");
-        require(value <= balanceOf[msg.sender], "Insufficient balance");
-
-        balanceOf[msg.sender] -= value;
-        balanceOf[to] += value;
-        emit Transfer(msg.sender, to, value);
-        return true;
-    }
-
-    function faucet(uint256 amount) external {
-        balanceOf[msg.sender] += amount;
-        totalSupply += amount;
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
     }
 }
