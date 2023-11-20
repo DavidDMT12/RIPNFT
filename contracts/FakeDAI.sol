@@ -8,7 +8,7 @@ contract FakeDAI is ERC20, ERC20Burnable {
     constructor()
         ERC20("FAKEDAI", "FDAI")
     {
-        _mint(msg.sender, 1000 * 10 ** decimals());
+        _mint(msg.sender, 0 * 10 ** decimals());
     }
 
     function mint(address to, uint256 amount) public {

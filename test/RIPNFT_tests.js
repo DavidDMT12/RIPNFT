@@ -1,254 +1,234 @@
-const FakeDAI = artifacts.require("FakeDAI");
-const RIPNFT = artifacts.require("RIPNFT");
-const { time } = require('@openzeppelin/test-helpers');
+const { ethers } = require('hardhat');
+const { expect } = require('chai');
+const {
+    loadFixture,
+  } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+  
+  describe("deploy fixture", function () {
 
-contract("Contract Deployment", async (accounts) => {
-  let fakeDAIInstance;
-  let ripNFTInstance;
-  const owner = accounts[0];
-  const creator = accounts[1];
-  const supporter = accounts[2];
-  const supporter2 = accounts[3];
+    async function deployFixture() {
+      
+    [owner, creator, supporter, supporter2] = await ethers.getSigners();
+  
+      
+     // Deploy FakeDAI contract
+    const FakeDAI = await ethers.getContractFactory("FakeDAI");
+    FakeDAIInstance = await FakeDAI.deploy();
 
-  beforeEach(async () => {
-    // Deploy FakeDAI contract
-    fakeDAIInstance = await FakeDAI.new();
+    // Deploy RIPNFT contract, passing FakeDAI address and URI as constructor arguments
+    const RIPNFT = await ethers.getContractFactory("RIPNFT");
+    RIPNFTInstance = await RIPNFT.deploy(FakeDAIInstance.target, "1");
+  
+      // Fixtures can return anything you consider useful for your tests
+      return { FakeDAIInstance, RIPNFTInstance, owner, creator, supporter, supporter2 };
+    }
+  
 
-    // Deploy RIPNFT contract, passing FakeDAI address
-    ripNFTInstance = await RIPNFT.new(fakeDAIInstance.address, "1");
-  });
-
-  it("should deploy FakeDAI and RIPNFT contracts", async () => {
-    assert.ok(fakeDAIInstance.address, "FakeDAI contract deployment failed");
-    assert.ok(ripNFTInstance.address, "RIPNFT contract deployment failed");
-  });
+describe("Deployment", function () {
 
   it("should deploy RIPNFT using the FakeDAI address", async () => {
-    const fakeDAIaddress = await ripNFTInstance.daiTokenAddress();
-    assert.equal(
-      fakeDAIaddress,
-      fakeDAIInstance.address,
-      "RIPNFT did not use the expected FakeDAI address"
-    );
+    const { RIPNFTInstance, FakeDAIInstance } = await loadFixture(deployFixture);
+    const daiTokenAddress = await RIPNFTInstance.daiTokenAddress();
+    expect(daiTokenAddress).to.equal(FakeDAIInstance.target);
   });
 
   it("should deploy RIPNFT using '1' as URI", async () => {
-    const uri = await ripNFTInstance.uri(0);
-    assert.equal(
-      uri,
-      "1",
-      "RIPNFT did not use '1' as the URI"
-    );
+    const { RIPNFTInstance, FakeDAIInstance } = await loadFixture(deployFixture);
+    const uri = await RIPNFTInstance.uri(0);
+    expect(uri).to.equal("1");
   });
 
   it("should start an event named test1 and have correct owner", async () => {
-    await ripNFTInstance.startEvent("test1", "2", 1, 100, { from: creator });
+    const { RIPNFTInstance, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 1, 100);
 
     // Retrieve the name of the event at index 1
-    const event = await ripNFTInstance.events(1);
+    const event = await RIPNFTInstance.events(1);
 
-    assert.equal(
-      event.Name,
-      "test1",
-      "The name of the event is not 'test1'"
-    );
-
-    assert.equal(
-      event.Creator,
-      creator,
-      "The event creator address is incorrect"
-    );
+    expect(event.Name).to.equal("test1");
+    expect(event.Creator).to.equal(creator.address);
   });
 
-  it("should start 3 events and check that test3 is on index 3", async () => {
-    await ripNFTInstance.startEvent("test1", "2", 1, 100, { from: creator });
-    await ripNFTInstance.startEvent("test2", "2", 1, 100, { from: creator });
-    await ripNFTInstance.startEvent("test3", "2", 1, 100, { from: creator });
+  it("should start 3 events and check that test3 is at index 3", async () => {
+    const { RIPNFTInstance, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 1, 100);
+    await RIPNFTInstance.connect(creator).startEvent("test2", "2", 1, 100);
+    await RIPNFTInstance.connect(creator).startEvent("test3", "2", 1, 100);
 
-    // Retrieve the name of the event at index 1
-    const event = await ripNFTInstance.events(3);
+    const event = await RIPNFTInstance.events(3);
 
-    assert.equal(
-      event.Name,
-      "test3",
-      "The name of the event3 is not 'test3'"
-    );
-
-    assert.equal(
-      event.Creator,
-      creator,
-      "The event creator address is incorrect"
-    );
+    expect(event.Name).to.equal("test3");
+    expect(event.Creator).to.equal(creator.address);
   });
 
-  it("should donate 100 DAI to test1", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 1000, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 1000, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(100, { from: supporter });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter });
-    const event = await ripNFTInstance.events(1);
-    const balance = await fakeDAIInstance.balanceOf(supporter)
+  it("should donate 100 DAI to test1", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter } = await loadFixture(deployFixture);
+    await RIPNFTInstance.startEvent("test1", "2", 1000, 100);
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
 
-    assert.equal(
-      event.FCoins,
-      100,
-      "the donated amount is incorrect"
-    );
+    const event = await RIPNFTInstance.events(1);
+    const balance = await FakeDAIInstance.balanceOf(supporter);
 
-    assert.equal(
-        balance.toString(),
-      "900",
-      "The donated amount was incorrect"
-    );
-    
-  }); 
-
-  it("should fail if not enough DAI when donating", async () => {
-    await ripNFTInstance.startEvent("test1", "2", 1000, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 10, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    try {
-        await ripNFTInstance.getFcoins(100, { from: supporter });
-        assert.fail("Transaction should have failed");
-    } catch (error) {
-        assert(error.message.includes("revert"), "Expected revert error");
-    }
+    expect(event.FCoins).to.equal(100);
+    expect(balance.toString()).to.equal("900");
   });
 
   it("should fail if not enough Fcoins donated", async () => {
-    await ripNFTInstance.startEvent("test1", "2", 1000, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 100, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(10, { from: supporter });
-    try {
-        await ripNFTInstance.payRespects(1, 100, { from: supporter });
-        assert.fail("Transaction should have failed");
-    } catch (error) {
-        assert(error.message.includes("revert"), "Expected revert error");
-    }
+    const { RIPNFTInstance, FakeDAIInstance, supporter } = await loadFixture(deployFixture);
+    await RIPNFTInstance.startEvent("test1", "2", 1000, 100);
+    await FakeDAIInstance.connect(supporter).mint(supporter, 100);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(10);
+
+    await expect(
+      RIPNFTInstance.connect(supporter).payRespects(1, 100)
+    ).to.be.reverted;
   });
 
   it("should fail if not enough time has passed before end", async () => {
-    await ripNFTInstance.startEvent("test1", "2", 10, 100, { from: creator });
-    await time.increase(time.duration.minutes(5));
+    const { RIPNFTInstance, supporter } = await loadFixture(deployFixture);
+    await RIPNFTInstance.startEvent("test1", "2", 10, 100);
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+
+    await expect(
+      RIPNFTInstance.connect(supporter).endEvent(1)
+    ).to.be.revertedWith("The event is still ongoing");
+  });
+
+  it("should mint an NFT for supporter", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(supporter).mintNFT(1);
+    const balance = await RIPNFTInstance.balanceOf(supporter, 1);
+    expect(balance).to.equal(1);
+  });
+
+  it("should end event and mint NFT to creator", async () => {
+    const { RIPNFTInstance, supporter, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    const balance = await RIPNFTInstance.balanceOf(creator, 1);
+    expect(balance).to.equal(1);
+  });
+
+  it("should fail on remint", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(supporter).mintNFT(1);
     try {
-        await ripNFTInstance.endEvent(1, { from: supporter });
-        assert.fail("Transaction should have failed");
+      await RIPNFTInstance.connect(supporter).mintNFT(1);
+      expect.fail("Transaction should have failed");
     } catch (error) {
-        assert(error.message.includes("revert"), "Expected revert error");
+      expect(error.message).to.include("You have already minted your NFT");
     }
   });
 
-  it("should mint an NFT for supporter", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 2, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 1000, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(100, { from: supporter });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter });
-    await time.increase(time.duration.minutes(5));
-    await ripNFTInstance.endEvent(1, { from: supporter });
-    await ripNFTInstance.mintNFT(1, { from: supporter });
-    const balance = await ripNFTInstance.balanceOf(supporter, 1)
-    assert.equal(
-        balance,
-      1,
-      "The NFT was not minted"
-    );
-  });
-
-  it("should end event and mint NFT to creator", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 2, 100, { from: creator });
-    await time.increase(time.duration.minutes(5));
-    await ripNFTInstance.endEvent(1, { from: supporter });
-    const event = await ripNFTInstance.events(1);
-    const balance = await ripNFTInstance.balanceOf(creator, 1)
-    assert.equal(
-      event.HasEnded,
-      true,
-      "the event was not ended"
-    );
-
-    assert.equal(
-        balance,
-      1,
-      "The NFT was not minted"
-    );
-  });
-
-  it("should fail on remint", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 2, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 1000, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(100, { from: supporter });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter });
-    await time.increase(time.duration.minutes(5));
-    await ripNFTInstance.endEvent(1, { from: supporter });
-    await ripNFTInstance.mintNFT(1, { from: supporter });
-    const balance = await ripNFTInstance.balanceOf(supporter, 1)
+  it("should fail if not a member", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(supporter).mintNFT(1);
     try {
-        await ripNFTInstance.mintNFT(1, { from: supporter });
-        assert.fail("Transaction should have failed");
+      await RIPNFTInstance.connect(supporter2).mintNFT(1);
+      expect.fail("Transaction should have failed");
     } catch (error) {
-        assert(error.message.includes("revert"), "Expected revert error");
+      expect(error.message).to.include("You are not a member.");
     }
   });
 
-  it("should fail if not member", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 2, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 1000, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(100, { from: supporter });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter });
-    await time.increase(time.duration.minutes(5));
-    await ripNFTInstance.endEvent(1, { from: supporter });
-    await ripNFTInstance.mintNFT(1, { from: supporter });
-    const balance = await ripNFTInstance.balanceOf(supporter, 1)
-    try {
-        await ripNFTInstance.mintNFT(1, { from: supporter2 });
-        assert.fail("Transaction should have failed");
-    } catch (error) {
-        assert(error.message.includes("revert"), "Expected revert error");
-    }
+  it("should mint an NFT for supporter", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+
+    await FakeDAIInstance.connect(supporter2).mint(supporter2, 1000);
+    await FakeDAIInstance.connect(supporter2).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter2).getFcoins(100);
+    await RIPNFTInstance.connect(supporter2).payRespects(1, 100);
+
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(supporter).mintNFT(1);
+    await RIPNFTInstance.connect(supporter2).mintNFT(1);
+
+    const balanceCreator = await RIPNFTInstance.balanceOf(creator, 1);
+    const balanceSupporter = await RIPNFTInstance.balanceOf(supporter, 1);
+    const balanceSupporter2 = await RIPNFTInstance.balanceOf(supporter2, 1);
+
+    expect(balanceCreator).to.equal(1, "The creator's NFT was not minted");
+    expect(balanceSupporter).to.equal(1, "Supporter's NFT was not minted");
+    expect(balanceSupporter2).to.equal(1, "Supporter2's NFT was not minted");
   });
 
-  it("should allow for several supporters", async () => { //Note not working with decimals
-    await ripNFTInstance.startEvent("test1", "2", 2, 100, { from: creator });
-    await fakeDAIInstance.mint(supporter, 1000, { from: supporter });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter });
-    await ripNFTInstance.getFcoins(100, { from: supporter });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter });
+  it("should let the creator withdraw 194 DAI", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
 
-    await fakeDAIInstance.mint(supporter2, 1000, { from: supporter2 });
-    await fakeDAIInstance.approve(ripNFTInstance.address, 1000, { from: supporter2 });
-    await ripNFTInstance.getFcoins(100, { from: supporter2 });
-    await ripNFTInstance.payRespects(1, 100, { from: supporter2 });
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
 
-    await time.increase(time.duration.minutes(5));
-    await ripNFTInstance.endEvent(1, { from: supporter });
-    await ripNFTInstance.mintNFT(1, { from: supporter });
-    await ripNFTInstance.mintNFT(1, { from: supporter2 });
+    await FakeDAIInstance.connect(supporter2).mint(supporter2, 1000);
+    await FakeDAIInstance.connect(supporter2).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter2).getFcoins(100);
+    await RIPNFTInstance.connect(supporter2).payRespects(1, 100);
 
-    const balance = await ripNFTInstance.balanceOf(creator, 1)
-    const balance2 = await ripNFTInstance.balanceOf(supporter, 1)
-    const balance3 = await ripNFTInstance.balanceOf(supporter2, 1)
-    assert.equal(
-        balance,
-      1,
-      "The NFT1 was not minted"
-    );
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(creator).claimDAI();
+    
+    const balance = await FakeDAIInstance.balanceOf(creator);
+    expect(balance).to.equal(194, "The balance is not 194");
+  });
 
-    assert.equal(
-        balance2,
-      1,
-      "The NFT2 was not minted"
-    );
+  it("should let the owner withdraw 6 DAI", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator, owner } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
 
-    assert.equal(
-        balance3,
-      1,
-      "The NFT2 was not minted"
-    );
-    });
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
 
-});
+    await FakeDAIInstance.connect(supporter2).mint(supporter2, 1000);
+    await FakeDAIInstance.connect(supporter2).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter2).getFcoins(100);
+    await RIPNFTInstance.connect(supporter2).payRespects(1, 100);
+
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(owner).takeprofits();
+    
+    const balance = await FakeDAIInstance.balanceOf(owner);
+    expect(balance).to.equal(6, "The balance is not 194");
+  });
+
+  });
+
+}); 
