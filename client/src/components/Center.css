@@ -1,16 +1,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
 .center {
-  width: 10%;
+  width: 30%;
   margin: auto;
-  padding: 50px 50px;
+  padding: 25px 25px;
   background: #fff;
   border: solid #E3E3E3 1px;
   border-radius: 20px;
+  height: px; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  height: 460px; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  margin-bottom: 30px;
 }
 .center h1 {
   font-size: 1.5em;
-  border-left: 5px solid dodgerblue;
+  border-left: 5px solid #2F2FA2;
   padding: 5px;
   color: #000;
   letter-spacing: 5px;
@@ -53,13 +60,45 @@
   font-size: 0.9em;
 }
 .center .inputbox [type="submit"] {
-  width: 50%;
-  background: dodgerblue;
+  width: 100%;
+  background: #2F2FA2;
   color: #fff;
   border: #fff;
   font-size:1em;
 
 }
 .center .inputbox:hover [type="submit"] {
-  background: linear-gradient(45deg, greenyellow, dodgerblue);
+  background: linear-gradient(45deg, #f64c72, #2F2FA2);
+}
+
+.popup {
+  position: fixed;
+  top: 20px; /* Adjust this value to change the distance from the top */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fefefe;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 9999;
+  width: 80%; /* Adjust the width as needed */
+  max-width: 10000px; /* Maximum width of the popup */
+}
+
+.popup-content {
+  text-align: center;
+}
+
+.close {
+  cursor: pointer;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }

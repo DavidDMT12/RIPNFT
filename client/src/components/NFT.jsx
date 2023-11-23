@@ -1,14 +1,31 @@
-import "./Event.css";
+import { useState } from 'react';
+import "./Center.css";
 const NFT=({state})=>{
-//mintNFT(uint256 _eventID)
+  const [popupMessage, setPopupMessage] = useState(null);
+
+  const handlePopupClose = () => {
+    setPopupMessage(null);
+    if (popupMessage === 'Transaction is successful') {
+      window.location.reload();
+    }
+  };
+
     const getNFT = async(event)=>{
       event.preventDefault();
       const {contract2}=state;
       const eventid = document.querySelector("#eventid").value;
+      try{
       const transaction = await contract2.mintNFT(eventid)
       await transaction.wait();
-      alert("NFT was minted");
-      window.location.reload();
+      setPopupMessage('Transaction is successful');
+    } catch (error) {
+      if (error.data && error.data.message) {
+        setPopupMessage(`Transaction failed: ${error.data.message}`);
+      } else {
+        console.error(error); // Log any other unexpected errors to the console
+        setPopupMessage('Transaction failed for an unexpected reason');
+      }
+    }
     }
     return  (
       <div className="center">
@@ -22,6 +39,17 @@ const NFT=({state})=>{
             <input type="submit" value="Mint NFT"  disabled={!state.contract}/>
           </div>
         </form>
+
+        {popupMessage && (
+        <div className="popup">
+          <div className="popup-content">
+            <span className="close" onClick={handlePopupClose}>
+              &times;
+            </span>
+            <p>{popupMessage}</p>
+          </div>
+        </div>
+      )}
           
         </div>
       );

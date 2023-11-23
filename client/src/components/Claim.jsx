@@ -1,7 +1,7 @@
-import "./Center.css";
+import "./Bottom.css";
 import { useState } from 'react';
 
-const End = ({ state }) => {
+const Claim = ({ state }) => {
   const [popupMessage, setPopupMessage] = useState(null);
 
   const handlePopupClose = () => {
@@ -11,12 +11,28 @@ const End = ({ state }) => {
     }
   };
 
-  const endEvent = async (event) => {
+  const claimOwner = async (event) => {
     event.preventDefault();
     const { contract2 } = state;
-    const id = document.querySelector("#id").value;
     try {
-      const transaction = await contract2.endEvent(id);
+      const transaction = await contract2.takeprofits();
+      await transaction.wait();
+      setPopupMessage('Transaction is successful');
+    } catch (error) {
+      if (error.data && error.data.message) {
+        setPopupMessage(`Transaction failed: ${error.data.message}`);
+      } else {
+        console.error(error); // Log any other unexpected errors to the console
+        setPopupMessage('Transaction failed for an unexpected reason');
+      }
+    }
+  };
+
+  const takeProfits = async (event) => {
+    event.preventDefault();
+    const { contract2 } = state;
+    try {
+      const transaction = await contract2.claimDAI();
       await transaction.wait();
       setPopupMessage('Transaction is successful');
     } catch (error) {
@@ -30,15 +46,18 @@ const End = ({ state }) => {
   };
 
   return (
-    <div className="center">
-      <h1>End Event </h1>
-      <form onSubmit={endEvent}>
+    <div className="bottom">
+      <h1>Claim profits</h1>
+
+      <form onSubmit={takeProfits}>
         <div className="inputbox">
-          <input type="text" required="required" id="id" />
-          <span>Event Id</span>
+          <input type="submit" value="Claim creator" disabled={!state.contract} />
         </div>
+      </form>
+
+      <form onSubmit={claimOwner}>
         <div className="inputbox">
-          <input type="submit" value="End Event" disabled={!state.contract} />
+          <input type="submit" value="Claim owner" disabled={!state.contract} />
         </div>
       </form>
 
@@ -56,4 +75,4 @@ const End = ({ state }) => {
   );
 };
 
-export default End;
+export default Claim;

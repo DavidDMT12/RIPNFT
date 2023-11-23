@@ -184,6 +184,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Re
     }
 
     function claimDAI() external {
+         require(creatorCut[msg.sender] > 0, "No DAI to claim");
         uint256 DAI = creatorCut[msg.sender];
         creatorCut[msg.sender] = 0;  // Reset the creator's cut after claiming
     
@@ -198,7 +199,8 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Re
         hasMinted[_eventID][msg.sender] = true;
     }
 
-    function takeprofits() external onlyOwner {
+    function takerofits() external onlyOwner {
+        require(adminBalance > 0, "No profits to take");
         uint256 DAI = adminBalance;
         adminBalance = 0;
         bool success = IERC20(daiTokenAddress).transfer(msg.sender, DAI);
