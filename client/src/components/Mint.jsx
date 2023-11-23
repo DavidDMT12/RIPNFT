@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import "./Center.css";
+import "./Top.css";
 const Mint=({state})=>{
   const [popupMessage, setPopupMessage] = useState(null);
 
@@ -31,7 +31,7 @@ const Mint=({state})=>{
       
     }
     return  (
-      <div className="center">
+      <div className="top">
        <h1>Faucet</h1>
         <form onSubmit={mintDAI}>
           <div className="inputbox">

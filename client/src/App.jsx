@@ -3,7 +3,7 @@ import FDAIabi from "./contractJson/FakeDAI.json";
 import RIPabi from "./contractJson/RIPNFT.json";
 
 import { ethers } from "ethers";
-//import Memos from './components/Memos'
+import Table from './components/Table'
 import Mint from './components/Mint';
 import Buy from './components/Buy';
 import Event from './components/Event';
@@ -93,18 +93,21 @@ function App() {
         </p>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+      <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
         <Mint state={state} />
         <Buy state={state} />
         <Pay state={state} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+      <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
         <Event state={state} />
         <End state={state} />
         <NFT state={state} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+      <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
         <Claim state={state} />
+      </div>
+      <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Table state={state} />
       </div>
     </div>
   );

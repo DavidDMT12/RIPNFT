@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import "./Center.css";
+import "./Top.css";
 
 const Pay=({state})=>{
 
@@ -31,7 +31,7 @@ const Pay=({state})=>{
     }
     }
     return  (
-      <div className="center">
+      <div className="top">
        <h1>Pay Respects</h1>
         <form onSubmit={payRes}>
           <div className="inputbox">

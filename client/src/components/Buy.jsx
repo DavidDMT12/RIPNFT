@@ -1,4 +1,4 @@
-import "./Center.css";
+import "./Top.css";
 import { useState } from 'react';
 
 const Buy = ({ state }) => {
@@ -35,7 +35,7 @@ const Buy = ({ state }) => {
   }
 
   return (
-    <div className="center">
+    <div className="top">
       <h1>GetFcoins</h1>
       <form onSubmit={buyF}>
         <div className="inputbox">

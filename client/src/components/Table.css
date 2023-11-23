@@ -1,0 +1,52 @@
+.container-fluid {
+  background: #fff;
+  border: solid #e3e3e3 1px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  padding: 20px; /* Add padding on all sides */
+  margin-right: 20px; /* Ensure at least 20px space to the right */
+  margin-bottom: 20px; /* Ensure at least 20px space to the bottom */
+}
+  
+.container-fluid h1 {
+  font-size: 1.5em;
+  border-left: 5px solid #2f2fa2;
+  padding: 5px;
+  color: #000;
+  letter-spacing: 5px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  padding-left: 10px;
+  text-align: left; /* Center align the content */
+}
+  }
+  
+  table {
+    width: 100%; /* Adjust table width if needed */
+  padding: 10px;
+  border-collapse: collapse;
+  margin-top: 20px; /* Add margin for separation */
+  border-radius: 20px; /* Rounded corners */
+  overflow: hidden;
+  }
+  
+  th,
+  td {
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #2f2fa2;
+    color: white;
+  }
+  
+  td {
+    background-color: #2f2fa263;
+    color: white;
+  }
+  
+  tbody tr:nth-child(odd) {
+    background-color: #2f2fa263;
+  }
+  

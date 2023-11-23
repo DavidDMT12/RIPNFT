@@ -95,7 +95,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Re
     uint256 public adminBalance;
     uint256 conversion = 1;
     address public daiTokenAddress;  // Address of the DAI token contract
-    uint256 eventCounter = 1; //Token 0 is FCoin
+    uint256 public eventCounter = 1; //Token 0 is FCoin
     mapping(uint256 => string) public _tokenURIs; //URIs of each event
     mapping(address => uint256) public creatorCut;
     struct Event {
@@ -116,8 +116,8 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Re
 
     //Events
     event BuyFCoin(address payer, uint256 amount);
-    event EventStarted(uint256 ID, address indexed creator, uint256 duration);
-    event EventEnded(uint256 ID, address indexed creator, uint256 amount);
+    event EventStarted(uint256 indexed ID, address indexed creator, uint256 duration);
+    event EventEnded(uint256 indexed ID, address indexed creator, uint256 amount);
 
     //Modifiers
 
