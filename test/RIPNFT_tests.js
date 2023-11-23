@@ -229,6 +229,60 @@ describe("Deployment", function () {
     expect(balance).to.equal(6, "The balance is not 194");
   });
 
+  it("should fail if the owner withdraw 0 DAI", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator, owner } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+
+    await FakeDAIInstance.connect(supporter2).mint(supporter2, 1000);
+    await FakeDAIInstance.connect(supporter2).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter2).getFcoins(100);
+    await RIPNFTInstance.connect(supporter2).payRespects(1, 100);
+
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(owner).takeprofits();
+    
+    try {
+      await RIPNFTInstance.connect(owner).takeprofits();
+      expect.fail("Transaction should have failed");
+    } catch (error) {
+      expect(error.message).to.include("No profits to take");
+    }
+
+  });
+
+  it("should fail if the creator withdraw 0 DAI", async () => {
+    const { RIPNFTInstance, FakeDAIInstance, supporter, supporter2, creator } = await loadFixture(deployFixture);
+    await RIPNFTInstance.connect(creator).startEvent("test1", "2", 2, 100);
+
+    await FakeDAIInstance.connect(supporter).mint(supporter, 1000);
+    await FakeDAIInstance.connect(supporter).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter).getFcoins(100);
+    await RIPNFTInstance.connect(supporter).payRespects(1, 100);
+
+    await FakeDAIInstance.connect(supporter2).mint(supporter2, 1000);
+    await FakeDAIInstance.connect(supporter2).approve(RIPNFTInstance.target, 1000);
+    await RIPNFTInstance.connect(supporter2).getFcoins(100);
+    await RIPNFTInstance.connect(supporter2).payRespects(1, 100);
+
+    await ethers.provider.send("evm_increaseTime", [5 * 60]); // Increase time by 5 minutes
+    await RIPNFTInstance.connect(supporter).endEvent(1);
+    await RIPNFTInstance.connect(creator).claimDAI();
+    
+    try {
+      await RIPNFTInstance.connect(creator).claimDAI();
+      expect.fail("Transaction should have failed");
+    } catch (error) {
+      expect(error.message).to.include("No DAI to claim");
+    }
+
+  });
+
   });
 
 }); 

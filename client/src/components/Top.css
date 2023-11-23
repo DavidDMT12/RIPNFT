@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+.top {
+  width: 30%;
+  margin: auto;
+  padding: 25px 25px;
+  background: #fff;
+  border: solid #E3E3E3 1px;
+  border-radius: 20px;
+  height: px; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  height: 330px; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  margin-bottom: 30px;
+}
+.top h1 {
+  font-size: 1.5em;
+  border-left: 5px solid #2F2FA2;
+  padding: 5px;
+  color: #000;
+  letter-spacing: 5px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  padding-left: 10px;
+}
+.top .inputbox {
+  position: relative;
+  width: 70%;
+  height: 20px;
+  margin-bottom: 50px;
+}
+.top .inputbox input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border: 2px solid #000;
+  outline: none;
+  background: none;
+  padding: 7px;
+  border-radius: 10px;
+  font-size: 0.9em;
+}
+.top .inputbox:last-child {
+  margin-bottom: 0;
+}
+.top .inputbox span {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  font-size: 0.9em;
+  transition: 0.5s;
+  font-family: sans-serif;
+}
+.top .inputbox input:focus ~ span,
+.top .inputbox input:valid ~ span {
+  transform: translateX(-13px) translateY(-35px);
+  font-size: 0.9em;
+}
+.top .inputbox [type="submit"] {
+  width: 100%;
+  background: #2F2FA2;
+  color: #fff;
+  border: #fff;
+  font-size:1em;
+
+}
+.top .inputbox:hover [type="submit"] {
+  background: linear-gradient(45deg, #f64c72, #2F2FA2);
+}
+
+.popup {
+  position: fixed;
+  top: 20px; /* Adjust this value to change the distance from the top */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fefefe;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 9999;
+  width: 80%; /* Adjust the width as needed */
+  max-width: 10000px; /* Maximum width of the popup */
+}
+
+.popup-content {
+  text-align: center;
+}
+
+.close {
+  cursor: pointer;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
