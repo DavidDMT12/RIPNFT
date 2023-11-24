@@ -11,7 +11,9 @@ import End from './components/End';
 import NFT from './components/NFT';
 import Pay from './components/Pay';
 import Claim from './components/Claim';
+import Display from './components/Display';
 import './App.css';
+import img from './assets/FCoin.svg';
 
 function App() {
   const [state, setState] = useState({
@@ -91,6 +93,7 @@ function App() {
           <small>BalanceDAI - {balanceDAI}</small>
           {/* Display balanceDAI */}
         </p>
+        <img src={img} alt="FCoin Logo" className="fcoin-logo" />
       </div>
 
       <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -108,6 +111,9 @@ function App() {
       </div>
       <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
         <Table state={state} />
+      </div>
+      <div className="section-with-border" style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Display state={state} />
       </div>
     </div>
   );
