@@ -1,1 +1,5 @@
-
+{
+  "description": "FCoinToken", 
+  "image": "./src/assets/FCoin.png", 
+  "name": "FCoin"
+}
