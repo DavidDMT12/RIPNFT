@@ -7,7 +7,7 @@ const Table = ({ state }) => {
   useEffect(() => {
     const fetchAllEvents = async () => {
       const { contract2 } = state;
-      const eventCounter = 30;
+      const eventCounter = await contract2.eventCounter() -1;
 
       const allEvents = [];
       for (let eventId = 1; eventId <= eventCounter; eventId++) {

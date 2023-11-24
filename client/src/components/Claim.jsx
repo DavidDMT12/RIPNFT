@@ -15,7 +15,7 @@ const Claim = ({ state }) => {
     event.preventDefault();
     const { contract2 } = state;
     try {
-      const transaction = await contract2.takeprofits();
+      const transaction = await contract2.takeProfits(); //change this
       await transaction.wait();
       setPopupMessage('Transaction is successful');
     } catch (error) {
