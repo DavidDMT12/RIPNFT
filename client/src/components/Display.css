@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+.display {
+  width: 90%;
+  margin: auto;
+  padding: 25px 25px;
+  background: #fff;
+  border: solid #E3E3E3 1px;
+  border-radius: 20px;
+  height: px; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  height: 100%; /* Set the desired fixed height for the container */
+  overflow: hidden; /* Hide overflow content */
+  box-sizing: border-box;
+  margin-bottom: 30px;
+}
+.display h1 {
+  font-size: 1.5em;
+  border-left: 5px solid #2F2FA2;
+  padding: 5px;
+  color: #000;
+  letter-spacing: 5px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+

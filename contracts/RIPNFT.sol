@@ -93,7 +93,7 @@ contract RIPNFT is ERC1155, Ownable,  ERC1155Burnable, ERC1155Supply, IERC1155Re
 
 //Variables
     uint256 public adminBalance;
-    uint256 conversion = 1;
+    uint256 public conversion = 1;
     address public daiTokenAddress;  // Address of the DAI token contract
     uint256 public eventCounter = 1; //Token 0 is FCoin
     mapping(uint256 => string) public _tokenURIs; //URIs of each event
