@@ -102,3 +102,30 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 80%;
+  max-width: 10000px;
+  background-color: #fefefe;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  position: fixed;
+  top: 20px; /* Adjust this value to change the distance from the top */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

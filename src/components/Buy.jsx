@@ -7,7 +7,7 @@ const Buy = ({ state }) => {
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'FCoins aquired successfully') {
       window.location.reload();
     }
   };
@@ -22,7 +22,7 @@ const Buy = ({ state }) => {
       await approval.wait();
       const transaction = await contract2.getFcoins(amount1)
       await transaction.wait();
-      setPopupMessage("Transaction is successful"); // Update popup message
+      setPopupMessage("FCoins aquired successfully"); 
       window.location.reload();
     } catch (error) {
       if (error.data && error.data.message) {
@@ -36,7 +36,14 @@ const Buy = ({ state }) => {
 
   return (
     <div className="top">
-      <h1>GetFcoins</h1>
+      <div className="tooltip">
+        <h1>GetFcoins</h1>
+        <span className="tooltiptext">
+          <p>
+            This component is used to exchange FDAI for FCoins. The conversion is set 1 to 1 for testing.
+          </p>
+        </span>
+      </div>
       <form onSubmit={buyF}>
         <div className="inputbox">
           <input type="text" required="required" id="amount1" />

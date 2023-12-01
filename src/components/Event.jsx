@@ -6,7 +6,7 @@ const Event = ({ state }) => {
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'Event started') {
       window.location.reload();
     }
   };
@@ -21,7 +21,7 @@ const Event = ({ state }) => {
     try {
       const transaction = await contract2.startEvent(name, uri, duration, mintip);
       await transaction.wait();
-      setPopupMessage('Transaction is successful');
+      setPopupMessage('Event started');
       window.location.reload();
     } catch (error) {
       if (error.data && error.data.message) {
@@ -35,7 +35,14 @@ const Event = ({ state }) => {
 
   return (
     <div className="center">
-      <h1>Start Event </h1>
+      <div className="tooltip">
+        <h1>Start Event</h1>
+        <span className="tooltiptext">
+          <p>
+            Input the name, uri, duration in minutes and minimum tip in FCoins of the event you want to start. The event will be added to the list of events.
+          </p>
+        </span>
+      </div>
       <form onSubmit={startEvent}>
         <div className="inputbox">
           <input type="text" required="required" id="name" />

@@ -30,6 +30,28 @@ body {
   padding-bottom: 10px;
 }
 
+.no-wallet-message {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(45deg, #f64c72, #2F2FA2);
+  color: white;
+  position: relative; /* Add relative positioning to the header */
+}
+
+.no-wallet-message {
+  font-size: 1.5em;
+  letter-spacing: 5px;
+  font-weight: bold;
+  padding-left: 50px;
+  margin-top: 0; /* Remove default margin */
+}
+
+.no-wallet-message .account-info {
+  font-size: 1.2em;
+  margin-left: 30px;
+  padding-bottom: 10px;
+}
+
 /* Apply the same blue line to all sections */
 .section-with-border {
   padding-left: 20px; /* Adjust padding as needed */
