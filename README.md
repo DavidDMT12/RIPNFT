@@ -12,6 +12,8 @@ In this implementation the deployer takes 3% cut.
 
 Aave DAI address used for Sepolia testing: 0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357
 
-Latest Sepolia Test address: 0xfA5FA921E034cD7CB5c937f48462Cf0Fed651c21
+Latest testDAI Sepolia: 0x3042EC71201Df1A9aE4A2285371802F6efeC1a42
+Latest Sepolia Test address: 0x9FfBa46bc75c4924598a14C2b9b415993464E973
+collection: https://testnets.opensea.io/collection/unidentified-contract-ba4db024-9080-4e0e-8df9-8ebc
 
 Basic Sepolia tests concluded
