@@ -17,13 +17,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-        working-directory: client  # Set working directory to /client/
-
-      - name: Build project
-        run: npm run build
-        working-directory: client  # Set working directory to /client/
+      - name: Install dependencies and Build project
+        run: |
+          cd client  # Change directory to /client/
+          npm install
+          npm run build
+        working-directory: ./client  # Specify the working directory for the run command
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
