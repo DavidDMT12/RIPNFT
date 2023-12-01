@@ -18,7 +18,7 @@ const Buy = ({ state }) => {
     const { contract2 } = state;
     const amount1 = document.querySelector("#amount1").value;
     try {
-      const approval = await contract.approve('0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', amount1);
+      const approval = await contract.approve('0x9FfBa46bc75c4924598a14C2b9b415993464E973', amount1);
       await approval.wait();
       const transaction = await contract2.getFcoins(amount1)
       await transaction.wait();
