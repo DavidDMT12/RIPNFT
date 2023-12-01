@@ -28,8 +28,8 @@ function App() {
 
   useEffect(() => {
     const template = async () => {
-      const FDAIAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
-      const RIPAddress = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+      const FDAIAddress = "0x3042EC71201Df1A9aE4A2285371802F6efeC1a42";
+      const RIPAddress = "0x9FfBa46bc75c4924598a14C2b9b415993464E973";
       const FDAIABI = FDAIabi.abi;
       const RIPABI = RIPabi.abi;
       //Metamask part

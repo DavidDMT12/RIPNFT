@@ -10,6 +10,7 @@ const Display = ({ state }) => {
   useEffect(() => {
     const getEventCounter = async () => {
       const counter = await contract2.eventCounter() -1;
+      console.log(counter);
       setEventId(counter.toString());
     };
 
@@ -20,7 +21,7 @@ const Display = ({ state }) => {
     const getLastEventUri = async () => {
       const eventNumber = parseInt(eventId, 10);
       if (!isNaN(eventNumber)) {
-        const counter = await contract2.eventCounter();
+        const counter = await contract2.eventCounter() - 1;
         if (eventNumber > counter) {
           setLastEventUri("");
         } else {
