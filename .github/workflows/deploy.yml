@@ -17,18 +17,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Install dependencies and Build project
-        run: |
-          cd client  # Change directory to /client/
-          npm install
-          npm run build
-        working-directory: ./client  # Specify the working directory for the run command
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+
+      - name: Build project
+        run: npm run build
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
         with:
           name: production-files
-          path: ./client/dist  # Specify path to the built files in /client/
+          path: ./dist
 
   deploy:
     name: Deploy
@@ -41,10 +40,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: production-files
-          path: ./dist  # Download the artifact to /dist folder
+          path: ./dist
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist  # Specify the publish directory as /dist
+          publish_dir: ./dist
