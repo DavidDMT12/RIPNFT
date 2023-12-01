@@ -47,7 +47,14 @@ const Claim = ({ state }) => {
 
   return (
     <div className="bottom">
-      <h1>Claim profits</h1>
+      <div className="tooltip">
+        <h1>Claim Profits</h1>
+        <span className="tooltiptext">
+          <p>
+            Claim profits as creator or protocol owner. 
+          </p>
+        </span>
+      </div>
 
       <form onSubmit={takeProfits}>
         <div className="inputbox">

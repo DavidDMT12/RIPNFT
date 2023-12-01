@@ -41,7 +41,14 @@ const Display = ({ state }) => {
 
   return (
     <div className="display">
-      <h1>Latest Event</h1>
+      <div className="tooltip">
+        <h1>Latest Event</h1>
+        <span className="tooltiptext">
+          <p>
+            Display the latest event. Input the event ID to display a specific NFT.
+          </p>
+        </span>
+      </div>
       <div className="event-selector">
         <label htmlFor="eventId">Enter Event ID: </label>
         <input

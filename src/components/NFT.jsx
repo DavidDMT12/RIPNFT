@@ -5,7 +5,7 @@ const NFT=({state})=>{
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'NFT Minted') {
       window.location.reload();
     }
   };
@@ -17,7 +17,7 @@ const NFT=({state})=>{
       try{
       const transaction = await contract2.mintNFT(eventid)
       await transaction.wait();
-      setPopupMessage('Transaction is successful');
+      setPopupMessage('NFT Minted');
     } catch (error) {
       if (error.data && error.data.message) {
         setPopupMessage(`Transaction failed: ${error.data.message}`);
@@ -29,7 +29,14 @@ const NFT=({state})=>{
     }
     return  (
       <div className="center">
-       <h1>Mint NFT </h1>
+       <div className="tooltip">
+        <h1>Mint NFT</h1>
+        <span className="tooltiptext">
+          <p>
+           Input an event you are a supporter of to mint your NFT. 
+          </p>
+        </span>
+      </div>
         <form onSubmit={getNFT}>
           <div className="inputbox">
             <input type="text" required="required" id="eventid" />

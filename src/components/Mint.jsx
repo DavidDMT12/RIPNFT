@@ -5,7 +5,7 @@ const Mint=({state})=>{
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'FDAI minted successfully!') {
       window.location.reload();
     }
   };
@@ -19,7 +19,7 @@ const Mint=({state})=>{
       try{
       const transaction = await contract.mint(address, amount)
       await transaction.wait();
-      setPopupMessage('Transaction is successful');
+      setPopupMessage('FDAI minted successfully!');
     } catch (error) {
       if (error.data && error.data.message) {
         setPopupMessage(`Transaction failed: ${error.data.message}`);
@@ -32,7 +32,14 @@ const Mint=({state})=>{
     }
     return  (
       <div className="top">
-       <h1>Faucet</h1>
+       <div className="tooltip">
+        <h1>Faucet</h1>
+        <span className="tooltiptext">
+          <p>
+            This component is used for minting FakeDAI. Input the address you want to mint to and the amount. No decimals implemented yet.
+          </p>
+        </span>
+      </div>
         <form onSubmit={mintDAI}>
           <div className="inputbox">
             <input type="text" required="required" id="address" />

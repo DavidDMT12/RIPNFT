@@ -7,7 +7,7 @@ const Pay=({state})=>{
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'You have payed your respects!') {
       window.location.reload();
     }
   };
@@ -20,7 +20,7 @@ const Pay=({state})=>{
       try {
       const transaction = await contract2.payRespects(evid, tip);
       await transaction.wait();
-      setPopupMessage('Transaction is successful');
+      setPopupMessage('You have payed your respects!');
     } catch (error) {
       if (error.data && error.data.message) {
         setPopupMessage(`Transaction failed: ${error.data.message}`);
@@ -32,7 +32,14 @@ const Pay=({state})=>{
     }
     return  (
       <div className="top">
-       <h1>Pay Respects</h1>
+       <div className="tooltip">
+        <h1>Pay Respects</h1>
+        <span className="tooltiptext">
+          <p>
+            Input an active event id and the amount of FCoins you want to tip. The tip will be added to the event's total tip.
+          </p>
+        </span>
+      </div>
         <form onSubmit={payRes}>
           <div className="inputbox">
             <input type="text" required="required" id="evid" />

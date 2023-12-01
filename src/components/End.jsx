@@ -6,7 +6,7 @@ const End = ({ state }) => {
 
   const handlePopupClose = () => {
     setPopupMessage(null);
-    if (popupMessage === 'Transaction is successful') {
+    if (popupMessage === 'Event Ended') {
       window.location.reload();
     }
   };
@@ -18,7 +18,7 @@ const End = ({ state }) => {
     try {
       const transaction = await contract2.endEvent(id);
       await transaction.wait();
-      setPopupMessage('Transaction is successful');
+      setPopupMessage('Event Ended');
     } catch (error) {
       if (error.data && error.data.message) {
         setPopupMessage(`Transaction failed: ${error.data.message}`);
@@ -31,7 +31,14 @@ const End = ({ state }) => {
 
   return (
     <div className="center">
-      <h1>End Event </h1>
+      <div className="tooltip">
+        <h1>End Event</h1>
+        <span className="tooltiptext">
+          <p>
+            Input the id of the event you want to end. 
+          </p>
+        </span>
+      </div>
       <form onSubmit={endEvent}>
         <div className="inputbox">
           <input type="text" required="required" id="id" />
